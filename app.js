@@ -29,7 +29,7 @@ io.on('connection', socket =>{
     });
 
     socket.on('user mousemove', function(position){
-        io.emit('user mousemove', {position: position, userid: socket.id});
+        socket.broadcast.emit('user mousemove', {position: position, userid: socket.id});
       });
 });
 

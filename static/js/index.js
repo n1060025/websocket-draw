@@ -3,13 +3,20 @@ $(document).ready(()=>{
   var socket = io.connect(),
       objects = {},
       lastPosition = {x: 0, y: 0},
-      ctx = $('canvas')[0].getContext('2d')
+      ctx = $('canvas')[0].getContext('2d'),
+      dt = 0
+      ctx.lineWidth = 2
 
     $('canvas').on('mousemove', (e)=>{
-      if(lastPosition.x !== e.offsetX || lastPosition.y !== e.offsetY)
+      if((lastPosition.x !== e.offsetX || lastPosition.y !== e.offsetY)
+      && (Date.now() - dt > 20)
+      //&&((lastPosition.x - e.offsetX)*(lastPosition.x - e.offsetX) > 10 || (lastPosition.x - e.offsetX)*(lastPosition.x - e.offsetX) > 10)
+    ){
+      dt = Date.now()
+        draw(ctx, {x: e.offsetX, y:e.offsetY}, lastPosition)
         lastPosition = {x: e.offsetX, y: e.offsetY}
         socket.emit('user mousemove', {x: e.offsetX, y: e.offsetY})
-    })
+    }})
 
     socket.on('button click', (timestamp)=>{
         $('ul').append('<li>button was clicked '+(Date.now() - parseInt(timestamp))+'ms ago</li>')
@@ -24,7 +31,7 @@ $(document).ready(()=>{
     socket.on('user disconnect', (userid)=>{
         delete objects[userid]
 
-        ctx.clearRect(0,0,600,600)
+        //ctx.clearRect(0,0,600,600)
         for (var key in objects) {
             //console.log(objects[key])
             draw(ctx, objects[key])
@@ -33,19 +40,26 @@ $(document).ready(()=>{
 
     socket.on('user mousemove', (data)=>{
         //console.log(objects)
-        objects[data.userid] = data.position
         //console.log(data.position)
+        if(objects[data.userid])
+          draw(ctx, data.position, objects[data.userid])
 
         //ctx.clearRect(0,0,600,600)
-        for (var key in objects) {
+        /*for (var key in objects) {
             //console.log(objects[key])
             draw(ctx, objects[key])
-          }
+          }*/
+        objects[data.userid] = data.position
     })
 })
 
-function draw(ctx, object){
+function draw(ctx, object, last){
   ctx.beginPath();
-  ctx.arc(object.x,object.y,5,0,2*Math.PI);
-  ctx.fill()
+
+  if(!!last.x || !!last.y){
+    ctx.moveTo(last.x, last.y)
+    ctx.lineTo(object.x, object.y)
+    //ctx.arc(object.x,object.y,5,0,2*Math.PI);
+    ctx.stroke()
+  }
 }
