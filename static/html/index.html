@@ -5,19 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Titel</title>
     <style>
-        body{background: #eee;margin: 0;display: flex;align-items: center;justify-content: center;height: 100vh;}
-        canvas{background: #fff;}ul{position: fixed;top: 20px;left: 50%;transform: translateX(-50%);padding: 0;list-style: none;}
-        li{overflow: hidden;background: #ddd;height: 1.2em;padding: 5px 40px;margin-bottom: 10px;animation: hide  1s 1s forwards;}
-        @keyframes hide {
-          0% {opacity: 1;height: 1.2em;padding: 5px 40px;margin-bottom: 10px;}
-          100% {opacity: 0;height: 0em;padding: 0px 40px;margin-bottom: 0px;}
-        }
+        body{font-family: sans-serif;background: #eee;margin: 0;display: flex;flex-direction:column;align-items: center;justify-content: center;height: 100vh;}
+        canvas{background: #fff;} a{margin: 20px}
     </style>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script src="/static/js/index.js"></script>
   </head>
   <body>
+    <a href="https://github.com/n1060025/websocket-draw">https://github.com/n1060025/websocket-draw</a>
     <canvas id="canvas" width="400" height="400"></canvas>
   </body>
 </html>

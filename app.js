@@ -45,7 +45,7 @@ io.on('connection', socket =>{
 
 
 http.listen(8080, ()=>{
-  console.log('http+websocket listening on port 8080');
+  console.log('http+websocket listening on port 8080, check version');
 });
 
 

@@ -9,7 +9,9 @@ $(document).ready(()=>{
       selfColor = Math.floor(Math.random()*possibleColors.length)
       ctx.lineWidth = 2
 
+$('canvas').on('mousedown', (e1)=>{
 
+    lastPosition = {x: e1.offsetX, y: e1.offsetY}
     $('canvas').on('mousemove', (e)=>{
       if((lastPosition.x !== e.offsetX || lastPosition.y !== e.offsetY)
       && (Date.now() - dt > 20)
@@ -19,7 +21,12 @@ $(document).ready(()=>{
         draw(ctx, {x: e.offsetX, y:e.offsetY}, lastPosition, possibleColors[ selfColor ])
         lastPosition = {x: e.offsetX, y: e.offsetY}
         socket.emit('user mousemove', {x: e.offsetX, y: e.offsetY})
-    }})
+      }})
+    })
+
+    $(document).on('mouseup', (e5)=>{
+        $('canvas').unbind('mousemove')
+    })
 
     socket.on('button click', (timestamp)=>{
         $('ul').append('<li>button was clicked '+(Date.now() - parseInt(timestamp))+'ms ago</li>')
@@ -50,7 +57,7 @@ $(document).ready(()=>{
         //console.log(objects)
         //console.log(data.position)
         if(objects[data.userid]){
-          
+
           draw(ctx, data.position, objects[data.userid], possibleColors[ objects[data.userid].clr ])
           objects[data.userid].x = data.position.x
           objects[data.userid].y = data.position.y
