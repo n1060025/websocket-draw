@@ -1,6 +1,6 @@
 $(document).ready(()=>{
 
-  var socket = io.connect('http://localhost:3000'),
+  var socket = io.connect(),
       objects = {},
       lastPosition = {x: 0, y: 0},
       ctx = $('canvas')[0].getContext('2d')

@@ -3,10 +3,12 @@ const app = express()
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-
+/*
 app.listen(8080, ()=>{
   console.log('express listening on port 8080')
-})
+})*/
+
+
 //Index Page
 app.get('/',(req, res)=>{
    res.sendFile(__dirname+'/static/html/index.html')
@@ -32,7 +34,7 @@ io.on('connection', socket =>{
 });
 
 
-http.listen(3000, ()=>{
+http.listen(8080, ()=>{
   console.log('http listening on port 3000');
 });
 
