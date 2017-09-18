@@ -4,8 +4,11 @@ $(document).ready(()=>{
       objects = {},
       lastPosition = {x: 0, y: 0},
       ctx = $('canvas')[0].getContext('2d'),
-      dt = 0
+      dt = 0,
+      possibleColors = ['#001f3f','#0074D9','#7FDBFF','#39CCCC','#3D9970','#2ECC40','#01FF70','#FFDC00','#FF851B','#FF4136','#85144b','#F012BE','#B10DC9','#111111','#AAAAAA','#DDDDDD' ]
+      ctx.strokeStyle = possibleColors[Math.floor(Math.random()*possibleColors.length)]
       ctx.lineWidth = 2
+
 
     $('canvas').on('mousemove', (e)=>{
       if((lastPosition.x !== e.offsetX || lastPosition.y !== e.offsetY)
