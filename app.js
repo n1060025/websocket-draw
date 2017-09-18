@@ -3,6 +3,7 @@ const app = express()
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var users  = 0
 /*
 app.listen(8080, ()=>{
   console.log('express listening on port 8080')
@@ -20,11 +21,11 @@ app.use('/static/js/', express.static(__dirname+'/static/js/'))
 
 
 io.on('connection', socket =>{
-  console.log('a user connected '+socket.id);
+  console.log('a user connected '+socket.id+', there are '+ ++users + ' now');
   io.emit('user connect', socket.id);
 
   socket.on('disconnect', function(msg){
-      console.log('a user disconnected');
+      console.log('a user disconnected, there are '+ --users + ' now');
       io.emit('user disconnect', socket.id);
     });
 
@@ -41,6 +42,8 @@ http.listen(8080, ()=>{
 
 //404 not available
 app.get('*', (req, res)=>{
+  console.log('get request to: '+ req.url)
+  
   res.status(404).send('ERROR 404 at: <strong>'+ req.url
   +'</strong>    this resource does not exist yet')
 })

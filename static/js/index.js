@@ -56,7 +56,7 @@ $(document).ready(()=>{
 function draw(ctx, object, last){
   ctx.beginPath();
 
-  if(!!last.x || !!last.y){
+  if( last !== undefined && (!!last.x || !!last.y)){
     ctx.moveTo(last.x, last.y)
     ctx.lineTo(object.x, object.y)
     //ctx.arc(object.x,object.y,5,0,2*Math.PI);
