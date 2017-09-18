@@ -1,0 +1,12 @@
+{
+  "name": "Websocket_Drone",
+  "description": "Websocket Drone Control App",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "3.x",
+    "socket.io": "^2.0.3"
+  }
+}
