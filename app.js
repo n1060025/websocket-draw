@@ -4,8 +4,8 @@ const app = express()
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-app.listen(80, ()=>{
-  console.log('express listening on port 80')
+app.listen(8080, ()=>{
+  console.log('express listening on port 8080')
 })
 //Index Page
 app.get('/',(req, res)=>{
