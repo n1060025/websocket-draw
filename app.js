@@ -24,7 +24,7 @@ app.use('/static/js/', express.static(__dirname+'/static/js/'))
 
 io.on('connection', socket =>{
   users.push(socket.id)
-  let color = Math.floor(Math.random()*15)
+  var color = Math.floor(Math.random()*15)
   //colors.push(color)
   lastPositions.push({x: 0, y: 0})
   //console.log(users)
