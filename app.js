@@ -20,20 +20,20 @@ app.get('/', (req, res)=>{res.sendFile(__dirname+'/static/html/index.html')})
 */
 io.on('connection', socket =>{
   //interval persists canvas state every 10 secs
-  setInterval(function(){
+  /*setInterval(function(){
     if(users.length >= 1){
       fetchFromUser = users[Math.floor(users.length*Math.random())]
       socket.broadcast.to(fetchFromUser).emit('canvas request', '');
     }
-  },10000)
+  },10000)*/
 
   //if there are users online, the canvas is fetched from them, otherwise the persisted version is used
   if(users.length >= 1){
     fetchFromUser = users[Math.floor(users.length*Math.random())]
     socket.broadcast.to(fetchFromUser).emit('canvas request', socket.id);
-  }else if(persistedCanvas !== undefined){
+  }/*else if(persistedCanvas !== undefined){
     socket.emit('canvas send', persistedCanvas);
-  }
+  }*/
 
   //save users socketId and mouse position
   users.push(socket.id)
