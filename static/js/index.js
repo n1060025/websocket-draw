@@ -75,7 +75,7 @@ $('canvas').on('mousedown', (e1)=>{
 
     socket.on('user mousemove', (data)=>{
         //console.log(objects)
-        console.log(data)
+        //console.log(data)
         //if(objects[data.userid]){
 
           draw(ctx, data.toPosition, data.fromPosition, possibleColors[ data.color ])

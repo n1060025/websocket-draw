@@ -46,13 +46,13 @@ io.on('connection', socket =>{
     });
 
     socket.on('user mousemove', function(data){
-      let i = users.indexOf(socket.id)
+      var i = users.indexOf(socket.id)
         socket.broadcast.emit('user mousemove', {toPosition: data.position, fromPosition: lastPositions[i], color: data.clr});
         lastPositions[i] = data.position
       });
 
       socket.on('strokeEnd', function(position){
-        let i = users.indexOf(socket.id)
+        var i = users.indexOf(socket.id)
           lastPositions[i] = undefined
         });
 
