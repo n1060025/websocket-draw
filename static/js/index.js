@@ -6,7 +6,8 @@ $(document).ready(()=>{
       ctx = $('canvas')[0].getContext('2d'),
       dt = 0,
       possibleColors = ['#111111','#001f3f','#0074D9','#7FDBFF','#39CCCC','#3D9970','#2ECC40','#01FF70','#FFDC00','#FF851B','#FF4136','#85144b','#F012BE','#B10DC9','#AAAAAA','#DDDDDD' ],
-      selfColor = 0
+      selfColor = Math.floor(Math.random()*15)
+      $('.colorSwatch:nth-child('+(selfColor+1)+')').addClass('active')
       ctx.lineWidth = 2
 
 $('canvas').on('mousedown', (e1)=>{
@@ -37,6 +38,7 @@ $('canvas').on('mousedown', (e1)=>{
   })
 
   $('.clearButton').on('click', function(){
+
     ctx.clearRect(0,0,400,400)
     socket.emit('clear')
   })
@@ -49,41 +51,37 @@ $('canvas').on('mousedown', (e1)=>{
         $('ul').append('<li>button was clicked '+(Date.now() - parseInt(timestamp))+'ms ago</li>')
     })
 
-    socket.on('user connect', (userid)=>{
-        //alert('user connect '+msg)
-        //objects[userid] = {x: 0, y: 0, clr: Math.floor(Math.random()*possibleColors.length)}
-        //console.log(objects)
+    socket.on('canvas send', (canvasData)=>{
+          var imgData = ctx.createImageData(400, 400);
+          for(var i = 0; i < canvasData.length; i++) imgData.data[i] = canvasData[i]
+          ctx.putImageData(imgData, 0, 0)
     })
 
-    socket.on('user disconnect', (userid)=>{
-        delete objects[userid]
-
-        //ctx.clearRect(0,0,600,600)
-      /*  for (var key in objects) {
-            //console.log(objects[key])
-            draw(ctx, objects[key])
-          }*/
+    /*
+    * send current state of canvas to server
+    */
+    socket.on('canvas request', (toUserId)=>{
+          var canvasData = ctx.getImageData(0,0,400,400)
+          var dataArray = []
+          for(var i = 0; i < canvasData.data.length; i++) dataArray.push(canvasData.data[i])
+          console.log(canvasData)
+          socket.emit('canvas send', dataArray, toUserId)
     })
 
-    socket.on('self connected', (data)=>{
-      data.users.forEach((userid)=>{
-        objects[userid] = {x: 0, y: 0}
-      })
-      selfColor = data.color
-      $('.colorSwatch:nth-child('+(data.color+1)+')').addClass('active')
-    })
-
+    /*
+    * the mousmove events the socket-backend sends is received here
+    */
     socket.on('user mousemove', (data)=>{
-        //console.log(objects)
-        //console.log(data)
-        //if(objects[data.userid]){
-
           draw(ctx, data.toPosition, data.fromPosition, possibleColors[ data.color ])
-          //objects[data.userid].x = data.position.x
-          //objects[data.userid].y = data.position.y
-        //}
     })
 })
+
+
+
+
+
+
+//helper functions
 
 function draw(ctx, object, last, color){
   ctx.beginPath();
