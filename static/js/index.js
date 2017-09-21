@@ -5,7 +5,7 @@ $(document).ready(()=>{
       lastPosition = {x: 0, y: 0},
       ctx = $('canvas')[0].getContext('2d'),
       dt = 0,
-      possibleColors = ['#111111','#001f3f','#0074D9','#7FDBFF','#39CCCC','#3D9970','#2ECC40','#01FF70','#FFDC00','#FF851B','#FF4136','#85144b','#F012BE','#B10DC9','#AAAAAA','#DDDDDD' ],
+      possibleColors = ['#111111','#001f3f','#0074D9','#7FDBFF','#39CCCC','#3D9970','#2ECC40','#FFDC00','#FF851B','#FF4136','#85144b','#E20074','#B10DC9','#AAAAAA','#DDDDDD','#FFFFFF' ],
       selfColor = Math.floor(Math.random()*15)
       $('.colorSwatch:nth-child('+(selfColor+1)+')').addClass('active')
       ctx.lineWidth = 2
@@ -20,7 +20,7 @@ $(document).ready(()=>{
         var name = $('#username-input').val()
         if(name !== undefined && name !== '' && name !== ' '){//TODO: implement safer rules
           socket.emit('send username', name)
-          $('section.username').remove()
+          $('section.username').addClass('hidden')
           $('section.draw').removeClass('hidden')
         }
         return false
@@ -69,6 +69,8 @@ $('canvas').on('mousedown', (e1)=>{
     })
 
     socket.on('canvas send', (canvasData)=>{
+          console.log('received canvas data')
+          console.log(canvasData)
           var imgData = ctx.createImageData(400, 400);
           for(var i = 0; i < canvasData.length; i++) imgData.data[i] = canvasData[i]
           ctx.putImageData(imgData, 0, 0)
@@ -93,13 +95,14 @@ $('canvas').on('mousedown', (e1)=>{
     })
 
     socket.on('update userlist', usernames =>{
-    //  alert(usernames)
+      //alert(usernames)
       //TODO: remove all Loop and add to list
       //if name not  empty string ''
       $('.username-li').remove()
-      $('.userlist').append('<li class="username-li" data-name="' + usernames + '">' + usernames + '</li>')
+      usernames.forEach(user => {
+        $('.userlist').append('<li class="username-li" data-name="' + user + '">' + user + '</li>')
+      })
     })
-
 })
 
 

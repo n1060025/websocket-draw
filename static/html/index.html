@@ -7,8 +7,8 @@
     <style>
         body{font-family: sans-serif;background: #eee;margin: 0;display: flex;flex-direction:column;align-items: center;justify-content: center;height: 100vh;}
         canvas{background: #fff;} a{margin: 20px}
-        .colors{display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr auto;
-          grid-template-areas: ". . . . . . . . clear" ". . . . . . . . clear"; padding: 0}
+        .colors{display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+          grid-template-areas: ". . . . . . . ." ". . . . . . . ."; padding: 0}
         .colorSwatch{display: inline-block; width: 1.5em; height: 1.5em}
         .clearButton{display: flex; align-items: center; justify-content: center; width: 5em; height: 3em; grid-area: clear; background: #666; color: white; cursor: pointer}
         .clearButton.inactive{user-select: none;opacity: 0.2; cursor: not-allowed;}
@@ -16,6 +16,8 @@
         section.draw{display: flex; flex-direction: column; align-items: center}
         .hidden{display: none !important}
         .userlist{position: absolute; top: 20px; left: 10px;}
+        #username-form{width: 455px; display: flex; flex-wrap: wrap} #username-form>p{text-align: justify;margin: 5px 0; flex-basis: 100%}
+        #username-form>input{flex-grow: 1; margin-right: 8px; padding-left: 4px}
     </style>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
@@ -27,7 +29,7 @@
         <li class="heading">Users</li>
       </ul>
       <a href="https://github.com/n1060025/websocket-draw">https://github.com/n1060025/websocket-draw</a>
-      <canvas id="canvas" class="notReady" width="400" height="400"></canvas>
+      <canvas id="canvas" class="notReady" width="500" height="500"></canvas>
       <ul class="colors">
         <li class="colorSwatch" data-color="#111111" style="background: #111111" ></li>
         <li class="colorSwatch" data-color="#001f3f" style="background: #001f3f" ></li>
@@ -36,23 +38,23 @@
         <li class="colorSwatch" data-color="#39CCCC" style="background: #39CCCC" ></li>
         <li class="colorSwatch" data-color="#3D9970" style="background: #3D9970" ></li>
         <li class="colorSwatch" data-color="#2ECC40" style="background: #2ECC40" ></li>
-        <li class="colorSwatch" data-color="#01FF70" style="background: #01FF70" ></li>
         <li class="colorSwatch" data-color="#FFDC00" style="background: #FFDC00" ></li>
         <li class="colorSwatch" data-color="#FF851B" style="background: #FF851B" ></li>
         <li class="colorSwatch" data-color="#FF4136" style="background: #FF4136" ></li>
         <li class="colorSwatch" data-color="#85144b" style="background: #85144b" ></li>
-        <li class="colorSwatch" data-color="#F012BE" style="background: #F012BE" ></li>
+        <li class="colorSwatch" data-color="#E20074" style="background: #E20074" ></li>
         <li class="colorSwatch" data-color="#B10DC9" style="background: #B10DC9" ></li>
         <li class="colorSwatch" data-color="#AAAAAA" style="background: #AAAAAA" ></li>
         <li class="colorSwatch" data-color="#DDDDDD" style="background: #DDDDDD" ></li>
-        <li class="clearButton inactive">clear</li>
+        <li class="colorSwatch" data-color="#FFFFFF" style="background: #FFFFFF" ></li>
+        <!-- <li class="clearButton inactive">clear</li> -->
       </ul>
     </section>
     <section class="username">
       <form id="username-form">
-        <p>Please choose a funny username to gain access to the shared canvas</p>
+        <p>Please choose a username to gain access to the shared canvas</p>
         <input id="username-input" type="text" placeholder="Username"/>
-        <button id="saveUsernameButton" type="submit">Submit</button>
+        <button id="saveUsernameButton" type="submit">Enter</button>
       </form>
     </section>
   </body>

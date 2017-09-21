@@ -4,8 +4,9 @@ const http = require('http').Server(app)
 const io = require('socket.io')(http)
 
 var users = [],
-    usernames=[],
-    lastPositions = [] //last mouse opsition are persisted (in memory) here
+userlength = 0
+    //usernames=[],
+    //lastPositions = [] //last mouse opsition are persisted (in memory) here
   //  persistedCanvas //Canvas State is persisted (in memory) here
 
 /*
@@ -29,18 +30,23 @@ io.on('connection', socket =>{
   },10000)*/
 
   //if there are users online, the canvas is fetched from them, otherwise the persisted version is used
-  if(users.length >= 1){
-    fetchFromUser = users[Math.floor(users.length*Math.random())]
-    socket.broadcast.to(fetchFromUser).emit('canvas request', socket.id);
+  if(userlength >= 1){
+    socket.broadcast.emit('canvas request', socket.id);
   }/*else if(persistedCanvas !== undefined){
     socket.emit('canvas send', persistedCanvas);
   }*/
 
   //save users socketId and mouse position
-  users.push(socket.id)
-  usernames.push("")
-  lastPositions.push({x: 0, y: 0})
-  console.log('new user, there are '+ users.length + ' now')
+  userlength ++
+  users[socket.id] = {
+    name : '',
+    position: {
+      x: 0,
+      y: 0
+    }
+  }
+
+  console.log('new user, there are '+ userlength + ' now')
 
 
   /*
@@ -48,15 +54,17 @@ io.on('connection', socket =>{
   * Handle disconnect
   */
   socket.on('disconnect', (msg)=>{
-    var index = users.indexOf(socket.id);
+    userlength--;
+    delete users[socket.id]
 
-    users.splice(index, 1);
-    usernames.splice(index, 1);
-    lastPositions.splice(index, 1);
+    console.log('user disconnected, there are '+ userlength + ' now');
 
-    console.log('user disconnected, there are '+ users.length + ' now');
-
-
+    var usernames = []
+    for( var user in users) {
+      if (users[user].name !== undefined && users[user].name !== '')
+        usernames.push(users[user].name)
+      }
+      console.log(users)
     io.emit('update userlist', usernames);
   })
 
@@ -80,8 +88,8 @@ io.on('connection', socket =>{
   */
   socket.on('user mousemove', (data)=>{
     var i = users.indexOf(socket.id)
-    socket.broadcast.emit('user mousemove', {toPosition: data.position, fromPosition: lastPositions[i], color: data.clr});
-    lastPositions[i] = data.position
+    socket.broadcast.emit('user mousemove', {toPosition: data.position, fromPosition: users[socket.id].position, color: data.clr});
+    users[socket.id].position = data.position
   });
 
 
@@ -91,7 +99,7 @@ io.on('connection', socket =>{
   */
   socket.on('strokeEnd', function(position){
     var i = users.indexOf(socket.id)
-    lastPositions[i] = undefined
+    users[socket.id].position = undefined
   })
 
   /*
@@ -106,12 +114,18 @@ io.on('connection', socket =>{
   socket.on('send username', username=>{
 
 
-    usernames[users.indexOf(socket.id)] = username
+    users[socket.id].name = username
 
     console.log(username)
+
+    var usernames = []
+    for( var user in users) {
+      if (users[user].name !== undefined && users[user].name !== '')
+        usernames.push(users[user].name)
+      }
+      console.log(users)
     io.emit('update userlist', usernames);
   })
-
 })
 
 
