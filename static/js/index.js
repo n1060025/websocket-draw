@@ -12,7 +12,13 @@ $(document).ready(()=>{
 
 
 
-
+      var name = getCookie('username')
+      if(name !== undefined && name !== ''){
+        socket.emit('send username', name)
+        setCookie(name)
+        $('section.username').addClass('hidden')
+        $('section.draw').removeClass('hidden')
+      }
 
 
 
@@ -20,6 +26,7 @@ $(document).ready(()=>{
         var name = $('#username-input').val()
         if(name !== undefined && name !== '' && name !== ' '){//TODO: implement safer rules
           socket.emit('send username', name)
+          setCookie(name)
           $('section.username').addClass('hidden')
           $('section.draw').removeClass('hidden')
         }
@@ -27,12 +34,14 @@ $(document).ready(()=>{
       })
 
 
-$('canvas').on('mousedown', (e1)=>{
-
+$('canvas').on('mousedown dragstart', (e1)=>{
+    if(e1.which == 2 || e1.which == 3) return
+    
+    e1.preventDefault()
     lastPosition = {x: e1.offsetX, y: e1.offsetY}
     $('canvas').on('mousemove', (e)=>{
       if((lastPosition.x !== e.offsetX || lastPosition.y !== e.offsetY)
-      && (Date.now() - dt > 20)
+      && (Date.now() - dt > 15)
       //&&((lastPosition.x - e.offsetX)*(lastPosition.x - e.offsetX) > 10 || (lastPosition.x - e.offsetX)*(lastPosition.x - e.offsetX) > 10)
     ){
       dt = Date.now()
@@ -40,11 +49,18 @@ $('canvas').on('mousedown', (e1)=>{
         lastPosition = {x: e.offsetX, y: e.offsetY}
         socket.emit('user mousemove', {position: {x: e.offsetX, y: e.offsetY}, clr: selfColor})
       }})
-    })
 
-    $(document).on('mouseup', (e5)=>{
-        $('canvas').unbind('mousemove')
-        socket.emit('strokeEnd')
+      $('canvas').on('mouseout', (e5)=>{
+          draw(ctx, {x: e5.offsetX, y:e5.offsetY}, lastPosition, possibleColors[ selfColor ])
+          lastPosition = {x: e5.offsetX, y: e5.offsetY}
+          socket.emit('user mousemove', {position: {x: e5.offsetX, y: e5.offsetY}, clr: selfColor})
+      })
+
+      $(document).on('mouseup', ()=>{
+      //  alert();
+          $('canvas').unbind('mousemove mouseout')
+          socket.emit('strokeEnd')
+      })
     })
 
     $('.colorSwatch').on('click', function(){
@@ -60,9 +76,23 @@ $('canvas').on('mousedown', (e1)=>{
     socket.emit('clear')
   })
 
-    socket.on('clear', ()=>{
-        ctx.clearRect(0,0,400,400)
+    socket.on('reauthenticate', ()=>{
+      $('.draw').addClass('hidden')
+      $('.username').removeClass('hidden')
+
+      var name = getCookie('username')
+      if(name !== undefined && name !== ''){
+        socket.emit('send username', name)
+        setCookie(name)
+        $('section.username').addClass('hidden')
+        $('section.draw').removeClass('hidden')
+      }
+
     })
+
+      socket.on('clear', ()=>{
+          ctx.clearRect(0,0,400,400)
+      })
 
     socket.on('button click', (timestamp)=>{
         $('ul').append('<li>button was clicked '+(Date.now() - parseInt(timestamp))+'ms ago</li>')
@@ -121,4 +151,27 @@ function draw(ctx, object, last, color){
     //console.log(color)
     ctx.stroke()
   }
+}
+
+function setCookie(name) {
+    var d = new Date();
+    d.setTime(d.getTime() + (5*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = "username=" + name + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
 }

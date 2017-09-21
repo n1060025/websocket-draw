@@ -1,13 +1,11 @@
-const express = require('express')
-const app = express()
-const http = require('http').Server(app)
-const io = require('socket.io')(http)
+const express = require('express'),
+    app = express(),
+    http = require('http').Server(app),
+    io = require('socket.io')(http),
+    UserStorage = require('./classes/userStorage').UserStorage
 
-var users = [],
-userlength = 0
-    //usernames=[],
-    //lastPositions = [] //last mouse opsition are persisted (in memory) here
-  //  persistedCanvas //Canvas State is persisted (in memory) here
+var users = new UserStorage()
+
 
 /*
 *
@@ -21,51 +19,23 @@ app.get('/', (req, res)=>{res.sendFile(__dirname+'/static/html/index.html')})
 * Connections to the websocket interface are handled here
 */
 io.on('connection', socket =>{
-  //interval persists canvas state every 10 secs
-  /*setInterval(function(){
-    if(users.length >= 1){
-      fetchFromUser = users[Math.floor(users.length*Math.random())]
-      socket.broadcast.to(fetchFromUser).emit('canvas request', '');
-    }
-  },10000)*/
+  console.log('new connection')
 
   //if there are users online, the canvas is fetched from them, otherwise the persisted version is used
-  if(userlength >= 1){
+  if(users.getUserCount() >= 1){
     socket.broadcast.emit('canvas request', socket.id);
-  }/*else if(persistedCanvas !== undefined){
-    socket.emit('canvas send', persistedCanvas);
-  }*/
-
-  //save users socketId and mouse position
-  userlength ++
-  users[socket.id] = {
-    name : '',
-    position: {
-      x: 0,
-      y: 0
-    }
+    console.log('request canvas drawing from users')
   }
-
-  console.log('new user, there are '+ userlength + ' now')
-
 
   /*
   *
   * Handle disconnect
   */
   socket.on('disconnect', (msg)=>{
-    userlength--;
-    delete users[socket.id]
+    users.removeUser(socket.id)
+    console.log('user disconnected, there are '+ users.getUserCount() + ' now');
+    io.emit('update userlist', users.getUsernames());
 
-    console.log('user disconnected, there are '+ userlength + ' now');
-
-    var usernames = []
-    for( var user in users) {
-      if (users[user].name !== undefined && users[user].name !== '')
-        usernames.push(users[user].name)
-      }
-      console.log(users)
-    io.emit('update userlist', usernames);
   })
 
   /*
@@ -87,9 +57,18 @@ io.on('connection', socket =>{
   * Forward all mousestrokes between users
   */
   socket.on('user mousemove', (data)=>{
-    var i = users.indexOf(socket.id)
-    socket.broadcast.emit('user mousemove', {toPosition: data.position, fromPosition: users[socket.id].position, color: data.clr});
-    users[socket.id].position = data.position
+
+      var user = users.getUser(socket.id)
+    if(user != undefined){
+      socket.broadcast.emit('user mousemove', {
+        toPosition: data.position,
+        fromPosition: user.position,
+        color: data.clr
+      })
+      user.position = data.position
+    }else{
+      socket.emit('reauthenticate')
+    }
   });
 
 
@@ -98,8 +77,11 @@ io.on('connection', socket =>{
   * Handle end of mouseStroke (mouseup)
   */
   socket.on('strokeEnd', function(position){
-    var i = users.indexOf(socket.id)
-    users[socket.id].position = undefined
+    if(users.getUser(socket.id) != undefined){
+      users.getUser(socket.id).position = undefined
+    }else{
+        //socket.emit('reauthenticate')
+      }
   })
 
   /*
@@ -110,21 +92,13 @@ io.on('connection', socket =>{
     socket.broadcast.emit('clear')
   })
 
+//TODO: validate username
 
   socket.on('send username', username=>{
-
-
-    users[socket.id].name = username
-
-    console.log(username)
-
-    var usernames = []
-    for( var user in users) {
-      if (users[user].name !== undefined && users[user].name !== '')
-        usernames.push(users[user].name)
-      }
-      console.log(users)
-    io.emit('update userlist', usernames);
+    users.addUser(socket.id, username)
+    console.log('new user: ' + username)
+    console.log(users.getUsernames())
+    io.emit('update userlist', users.getUsernames());
   })
 })
 
@@ -134,7 +108,7 @@ io.on('connection', socket =>{
 
 
 http.listen(8080, ()=>{
-  console.log('http+websocket listening on port 8080, check version');
+  console.log('http + websocket listening on port 8080');
 });
 
 
