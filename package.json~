@@ -1,6 +1,6 @@
 {
-  "name": "Websocket_Draw",
-  "description": "Websocket multiuser drawing web application",
+  "name": "Websocket_Drone",
+  "description": "Websocket Drone Control App",
   "version": "0.0.1",
   "scripts": {
     "start": "node app.js"
