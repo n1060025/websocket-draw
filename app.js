@@ -4,8 +4,9 @@ const http = require('http').Server(app)
 const io = require('socket.io')(http)
 
 var users = [],
-    lastPositions = [], //last mouse opsition are persisted (in memory) here
-    persistedCanvas //Canvas State is persisted (in memory) here
+    usernames=[],
+    lastPositions = [] //last mouse opsition are persisted (in memory) here
+  //  persistedCanvas //Canvas State is persisted (in memory) here
 
 /*
 *
@@ -37,6 +38,7 @@ io.on('connection', socket =>{
 
   //save users socketId and mouse position
   users.push(socket.id)
+  usernames.push("")
   lastPositions.push({x: 0, y: 0})
   console.log('new user, there are '+ users.length + ' now')
 
@@ -49,9 +51,13 @@ io.on('connection', socket =>{
     var index = users.indexOf(socket.id);
 
     users.splice(index, 1);
+    usernames.splice(index, 1);
     lastPositions.splice(index, 1);
 
-    console.log('a user disconnected, there are '+ users.length + ' now');
+    console.log('user disconnected, there are '+ users.length + ' now');
+
+
+    io.emit('update userlist', usernames);
   })
 
   /*
@@ -94,8 +100,23 @@ io.on('connection', socket =>{
   */
   socket.on('clear', function(){
     socket.broadcast.emit('clear')
-  });
-});
+  })
+
+
+  socket.on('send username', username=>{
+
+
+    usernames[users.indexOf(socket.id)] = username
+
+    console.log(username)
+    io.emit('update userlist', usernames);
+  })
+
+})
+
+
+
+
 
 
 http.listen(8080, ()=>{

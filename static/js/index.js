@@ -10,6 +10,23 @@ $(document).ready(()=>{
       $('.colorSwatch:nth-child('+(selfColor+1)+')').addClass('active')
       ctx.lineWidth = 2
 
+
+
+
+
+
+
+      $('#username-form').submit(e => {
+        var name = $('#username-input').val()
+        if(name !== undefined && name !== '' && name !== ' '){//TODO: implement safer rules
+          socket.emit('send username', name)
+          $('section.username').remove()
+          $('section.draw').removeClass('hidden')
+        }
+        return false
+      })
+
+
 $('canvas').on('mousedown', (e1)=>{
 
     lastPosition = {x: e1.offsetX, y: e1.offsetY}
@@ -74,6 +91,15 @@ $('canvas').on('mousedown', (e1)=>{
     socket.on('user mousemove', (data)=>{
           draw(ctx, data.toPosition, data.fromPosition, possibleColors[ data.color ])
     })
+
+    socket.on('update userlist', usernames =>{
+    //  alert(usernames)
+      //TODO: remove all Loop and add to list
+      //if name not  empty string ''
+      $('.username-li').remove()
+      $('.userlist').append('<li class="username-li" data-name="' + usernames + '">' + usernames + '</li>')
+    })
+
 })
 
 
