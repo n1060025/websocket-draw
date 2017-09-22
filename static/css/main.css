@@ -27,6 +27,7 @@ canvas {
   display: -ms-grid;
   display: grid;
   grid-gap: 2px;
+  width: 500px;
   -ms-grid-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr auto;
       grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr auto;
   grid-template-areas: ". . . . . . . . userCount" ". . . . . . . . userCount";
@@ -35,7 +36,7 @@ canvas {
 
 .colorSwatch {
   display: inline-block;
-  width: 1.5em;
+  min-width: 1.5em;
   height: 1.5em;
 }
 

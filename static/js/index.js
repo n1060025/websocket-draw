@@ -6,49 +6,27 @@ $(document).ready(()=>{
       ctx = $('canvas')[0].getContext('2d'),
       dt = 0,
       possibleColors = ['#111111','#001f3f','#0074D9','#7FDBFF','#39CCCC','#3D9970','#2ECC40','#FFDC00','#FF851B','#FF4136','#85144b','#E20074','#B10DC9','#AAAAAA','#DDDDDD','#FFFFFF' ],
-      selfColor = Math.floor(Math.random()*15),
-      authenticated = false
+      selfColor = Math.floor(Math.random()*15)
+
       $('.colorSwatch:nth-child('+(selfColor+1)+')').addClass('active')
       ctx.lineWidth = 2
 
-      var name = getCookie('username')
-      if(authenticated == false  && name !== undefined && name !== ''){
-        socket.emit('send username', name)
-        setCookie(name)
-        $('section.username').addClass('hidden')
-        $('section.draw').removeClass('hidden')
-        authenticated = true
-      }
-
-
-
-      $('#username-form').submit(e => {
-        var name = $('#username-input').val()
-        if(authenticated == false  && name !== undefined && name !== ''){//TODO: implement safer rules
-          socket.emit('send username', name)
-          setCookie(name)
-          $('section.username').addClass('hidden')
-          $('section.draw').removeClass('hidden')
-          authenticated = true
-        }
-        return false
-      })
-
-
-$('canvas').on('mousedown dragstart', (e1)=>{
-    if(e1.which == 2 || e1.which == 3) return
-
+$('canvas').on('mousedown dragstart touchstart', (e1)=>{
+    if(e1.type === 'mousedown' && (e1.which == 2 || e1.which == 3)) return
     e1.preventDefault()
+
     lastPosition = {x: e1.offsetX, y: e1.offsetY}
-    $('canvas').on('mousemove', (e)=>{
-      if((lastPosition.x !== e.offsetX || lastPosition.y !== e.offsetY)
-      && (Date.now() - dt > 15)
-      //&&((lastPosition.x - e.offsetX)*(lastPosition.x - e.offsetX) > 10 || (lastPosition.x - e.offsetX)*(lastPosition.x - e.offsetX) > 10)
-    ){
-      dt = Date.now()
-        draw(ctx, {x: e.offsetX, y:e.offsetY}, lastPosition, possibleColors[ selfColor ])
-        lastPosition = {x: e.offsetX, y: e.offsetY}
-        socket.emit('user mousemove', {position: {x: e.offsetX, y: e.offsetY}, clr: selfColor})
+    $('canvas').on('mousemove touchmove', (e)=>{
+      console.log(e)
+      var x = e.offsetX || (e.touches[0].pageX - $('canvas').offset().left),
+      y = e.offsetY || (e.touches[0].pageY - $('canvas').offset().top)
+
+      if((lastPosition.x !== x || lastPosition.y !== y)
+      && (Date.now() - dt > 15)){
+        dt = Date.now()
+        draw(ctx, {x: x, y:y}, lastPosition, possibleColors[ selfColor ])
+        lastPosition = {x: x, y: y}
+        socket.emit('user mousemove', {position: {x: x, y: y}, clr: selfColor})
       }})
 
       $('canvas').on('mouseout', (e5)=>{
@@ -57,8 +35,7 @@ $('canvas').on('mousedown dragstart', (e1)=>{
           socket.emit('user mousemove', {position: {x: e5.offsetX, y: e5.offsetY}, clr: selfColor})
       })
 
-      $(document).on('mouseup', ()=>{
-      //  alert();
+      $(document).on('mouseup touchend', ()=>{
           $('canvas').unbind('mousemove mouseout')
           socket.emit('strokeEnd')
       })
@@ -67,7 +44,6 @@ $('canvas').on('mousedown dragstart', (e1)=>{
     $('.colorSwatch').on('click', function(){
       $('.active').removeClass('active')
       selfColor = possibleColors.indexOf(this.dataset.color)
-      //alert(selfColor)
       $(this).addClass('active')
   })
 
@@ -127,27 +103,4 @@ function draw(ctx, object, last, color){
     //console.log(color)
     ctx.stroke()
   }
-}
-
-function setCookie(name) {
-    var d = new Date();
-    d.setTime(d.getTime() + (5*24*60*60*1000));
-    var expires = "expires="+ d.toUTCString();
-    document.cookie = "username=" + name + ";" + expires + ";path=/";
-}
-
-function getCookie(cname) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for(var i = 0; i <ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
 }
