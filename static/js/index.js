@@ -6,7 +6,8 @@ $(document).ready(()=>{
       ctx = $('canvas')[0].getContext('2d'),
       dt = 0,
       possibleColors = ['#111111','#001f3f','#0074D9','#7FDBFF','#39CCCC','#3D9970','#2ECC40','#FFDC00','#FF851B','#FF4136','#85144b','#E20074','#B10DC9','#AAAAAA','#DDDDDD','#FFFFFF' ],
-      selfColor = Math.floor(Math.random()*15)
+      selfColor = Math.floor(Math.random()*15),
+      canvasInitialized = false
 
       $('.colorSwatch:nth-child('+(selfColor+1)+')').addClass('active')
       ctx.lineWidth = 2
@@ -54,12 +55,16 @@ $('canvas').on('mousedown dragstart touchstart', (e1)=>{
 
 
     socket.on('canvas send', (canvasData)=>{
+
+        if(!canvasInitialized){
           console.log('received canvas data')
           console.log(canvasData)
           var imgData = ctx.createImageData(500, 500);
           for(var i = 0; i < canvasData.length; i++) imgData.data[i] = canvasData[i]
           ctx.putImageData(imgData, 0, 0)
           $('.spinner').addClass('hidden')
+          canvasInitialized = true
+        }
     })
 
     /*

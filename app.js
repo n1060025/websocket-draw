@@ -3,7 +3,7 @@ const express = require('express'),
     http = require('http').Server(app),
     io = require('socket.io')(http),
     UserStorage = require('./classes/userStorage').UserStorage
-
+    canvasInitialized = false
 var users = new UserStorage()
 
 
