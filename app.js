@@ -12,6 +12,7 @@ var users = new UserStorage()
 * Serve Static Resources
 */
 app.use('/static/js/', express.static(__dirname+'/static/js/'))
+app.use('/static/css/', express.static(__dirname+'/static/css/'))
 app.get('/', (req, res)=>{res.sendFile(__dirname+'/static/html/index.html')})
 
 /*
