@@ -1,0 +1,106 @@
+body {
+  min-width: 500px;
+  font-family: sans-serif;
+  background: #eee;
+  margin: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  height: 100vh;
+}
+
+canvas {
+  background: #fff;
+}
+
+.colors {
+  display: -ms-grid;
+  display: grid;
+  grid-gap: 2px;
+  -ms-grid-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr auto;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr auto;
+  grid-template-areas: ". . . . . . . . userCount" ". . . . . . . . userCount";
+  padding: 0;
+}
+
+.colorSwatch {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+}
+
+.colorSwatch.active {
+  box-shadow: 0 0 0 2px #fff inset, 0 0 10px -2px;
+  z-index: 2;
+}
+
+.userCount {
+  display: block;
+  text-align: center;
+  width: 5em;
+  height: 3em;
+  grid-area: userCount;
+  background: #666;
+  color: white;
+  line-height: 45px;
+}
+
+.userCount span {
+  margin: 2px;
+}
+
+#srcCodeLink {
+  position: fixed;
+  bottom: 0px;
+  margin-bottom: 5px;
+  font-size: 0.8em;
+}
+
+.spinner {
+  margin-bottom: -500px;
+  height: 500px;
+  width: 500px;
+  background: #fff;
+  z-index: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.spinner:before {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 80px;
+  background: url("https://loading.io/spinners/double-ring/index.double-ring-spinner.png");
+  background: url("https://loading.io/spinners/double-ring/index.double-ring-spinner.svg"), -webkit-linear-gradient(transparent, transparent);
+  background: url("https://loading.io/spinners/double-ring/index.double-ring-spinner.svg"), linear-gradient(transparent, transparent);
+}
+
+.spinner:after {
+  content: "Connecting...";
+}
+
+.hidden {
+  display: none !important;
+}
