@@ -6,29 +6,30 @@ $(document).ready(()=>{
       ctx = $('canvas')[0].getContext('2d'),
       dt = 0,
       possibleColors = ['#111111','#001f3f','#0074D9','#7FDBFF','#39CCCC','#3D9970','#2ECC40','#FFDC00','#FF851B','#FF4136','#85144b','#E20074','#B10DC9','#AAAAAA','#DDDDDD','#FFFFFF' ],
-      selfColor = Math.floor(Math.random()*15)
+      selfColor = Math.floor(Math.random()*15),
+      authenticated = false
       $('.colorSwatch:nth-child('+(selfColor+1)+')').addClass('active')
       ctx.lineWidth = 2
 
-
-
       var name = getCookie('username')
-      if(name !== undefined && name !== ''){
+      if(authenticated == false  && name !== undefined && name !== ''){
         socket.emit('send username', name)
         setCookie(name)
         $('section.username').addClass('hidden')
         $('section.draw').removeClass('hidden')
+        authenticated = true
       }
 
 
 
       $('#username-form').submit(e => {
         var name = $('#username-input').val()
-        if(name !== undefined && name !== '' && name !== ' '){//TODO: implement safer rules
+        if(authenticated == false  && name !== undefined && name !== ''){//TODO: implement safer rules
           socket.emit('send username', name)
           setCookie(name)
           $('section.username').addClass('hidden')
           $('section.draw').removeClass('hidden')
+          authenticated = true
         }
         return false
       })
@@ -36,7 +37,7 @@ $(document).ready(()=>{
 
 $('canvas').on('mousedown dragstart', (e1)=>{
     if(e1.which == 2 || e1.which == 3) return
-    
+
     e1.preventDefault()
     lastPosition = {x: e1.offsetX, y: e1.offsetY}
     $('canvas').on('mousemove', (e)=>{
@@ -71,46 +72,25 @@ $('canvas').on('mousedown dragstart', (e1)=>{
   })
 
   $('.clearButton').on('click', function(){
-
-    ctx.clearRect(0,0,400,400)
+    ctx.clearRect(0,0,500,500)
     socket.emit('clear')
   })
 
-    socket.on('reauthenticate', ()=>{
-      $('.draw').addClass('hidden')
-      $('.username').removeClass('hidden')
-
-      var name = getCookie('username')
-      if(name !== undefined && name !== ''){
-        socket.emit('send username', name)
-        setCookie(name)
-        $('section.username').addClass('hidden')
-        $('section.draw').removeClass('hidden')
-      }
-
-    })
-
-      socket.on('clear', ()=>{
-          ctx.clearRect(0,0,400,400)
-      })
-
-    socket.on('button click', (timestamp)=>{
-        $('ul').append('<li>button was clicked '+(Date.now() - parseInt(timestamp))+'ms ago</li>')
-    })
 
     socket.on('canvas send', (canvasData)=>{
           console.log('received canvas data')
           console.log(canvasData)
-          var imgData = ctx.createImageData(400, 400);
+          var imgData = ctx.createImageData(500, 500);
           for(var i = 0; i < canvasData.length; i++) imgData.data[i] = canvasData[i]
           ctx.putImageData(imgData, 0, 0)
+          $('.spinner').addClass('hidden')
     })
 
     /*
     * send current state of canvas to server
     */
     socket.on('canvas request', (toUserId)=>{
-          var canvasData = ctx.getImageData(0,0,400,400)
+          var canvasData = ctx.getImageData(0,0,500,500)
           var dataArray = []
           for(var i = 0; i < canvasData.data.length; i++) dataArray.push(canvasData.data[i])
           console.log(canvasData)
@@ -124,14 +104,10 @@ $('canvas').on('mousedown dragstart', (e1)=>{
           draw(ctx, data.toPosition, data.fromPosition, possibleColors[ data.color ])
     })
 
-    socket.on('update userlist', usernames =>{
-      //alert(usernames)
-      //TODO: remove all Loop and add to list
-      //if name not  empty string ''
-      $('.username-li').remove()
-      usernames.forEach(user => {
-        $('.userlist').append('<li class="username-li" data-name="' + user + '">' + user + '</li>')
-      })
+    socket.on('usercount update', usercount =>{
+            $('.userCount span').text(usercount)
+            if(usercount === 1)
+              $('.spinner').addClass('hidden')
     })
 })
 
