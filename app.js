@@ -3,7 +3,7 @@ const express = require('express'),
     http = require('http').Server(app),
     io = require('socket.io')(http),
     UserStorage = require('./classes/userStorage').UserStorage
-
+    canvasInitialized = false
 var users = new UserStorage()
 
 
@@ -58,12 +58,14 @@ io.on('connection', socket =>{
   */
   socket.on('user mousemove', (data)=>{
     var user = users.getUser(socket.id)
+    if(users.getUser(socket.id)){
       socket.broadcast.emit('user mousemove', {
         toPosition: data.position,
         fromPosition: user.position,
         color: data.clr
       })
       user.position = data.position
+    }
   });
 
 
@@ -72,7 +74,8 @@ io.on('connection', socket =>{
   * Handle end of mouseStroke (mouseup)
   */
   socket.on('strokeEnd', function(position){
-    users.getUser(socket.id).position = undefined
+    if(users.getUser(socket.id))
+      users.getUser(socket.id).position = undefined
   })
 })
 
