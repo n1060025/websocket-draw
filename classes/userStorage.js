@@ -6,8 +6,8 @@ exports.UserStorage = class{
     this.idArray = []
   }
 
-  addUser(socketId, name){
-    this.userArray.push(new User(socketId, name))
+  addUser(socketId){
+    this.userArray.push(new User(socketId))
     this.idArray[socketId] = this.userArray.length - 1
   }
 
@@ -19,14 +19,6 @@ exports.UserStorage = class{
       var user = this.userArray[i]
       this.idArray[user.socketId] = i
     }
-  }
-
-  getUsernames(){
-    var names = []
-    this.userArray.forEach(user => {
-      names.push(user.name)
-    })
-    return names
   }
 
   getUser(socketId){
@@ -42,10 +34,7 @@ exports.UserStorage = class{
 
 
 
-function User(socketId, name){
+function User(socketId){
   this.position = undefined
-
-  this.color = -1
-  this.name = name
   this.socketId = socketId
 }
